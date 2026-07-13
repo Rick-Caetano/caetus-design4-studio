@@ -1,0 +1,7 @@
+tokens:
+  bg:      "oklch(15% 0.02 280)"
+  surface: "oklch(22% 0.03 280)"
+  fg:      "oklch(97% 0.005 250)"
+  accent:  "oklch(72% 0.22 145)"
+  muted:   "oklch(70% 0.02 280)"
+  border:  "oklch(30% 0.02 280)"

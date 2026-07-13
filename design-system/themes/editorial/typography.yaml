@@ -1,0 +1,14 @@
+# Google Fonts — o loader monta um <link rel="stylesheet"> em vez de @font-face.
+googleFontsUrl: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Sans+3:wght@400;600;700&display=swap"
+
+display:
+  family: "Playfair Display"
+  stack: "Georgia, 'Times New Roman', serif"
+
+body:
+  family: "Source Sans 3"
+  stack: "system-ui, sans-serif"
+
+mono:
+  family: "Source Sans 3"
+  stack: "monospace"
