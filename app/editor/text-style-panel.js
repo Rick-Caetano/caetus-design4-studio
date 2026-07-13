@@ -15,6 +15,8 @@
 
 import bus from '../events/bus.js';
 import { getText } from '../canvas/text.js';
+import themes from '../../design-system/themes/index.js';
+import { renderBrandSwatches } from './brand-swatches.js';
 
 let currentKey = null;
 
@@ -77,12 +79,13 @@ function syncFromState() {
   document.getElementById('text-style-panel-label').innerText = text.label;
 
   const colorInput = document.getElementById('text-style-color');
-  if (!isFocused(colorInput)) colorInput.value = typography.color || fallback.color;
+  if (!isFocused(colorInput)) colorInput.value = typography.customColor || typography.color || fallback.color;
 
   const bgColorInput = document.getElementById('text-style-bg-color');
-  if (!isFocused(bgColorInput)) bgColorInput.value = background.color || '#000000';
+  if (!isFocused(bgColorInput)) bgColorInput.value = background.customColor || background.color || '#000000';
 
-  document.getElementById('text-style-radius-wrap').classList.toggle('hidden', !background.color);
+  const hasBg = background.colorToken || background.customColor || background.color;
+  document.getElementById('text-style-radius-wrap').classList.toggle('hidden', !hasBg);
   const radiusInput = document.getElementById('text-style-bg-radius');
   if (!isFocused(radiusInput)) radiusInput.value = border.radius || 0;
 
@@ -96,11 +99,30 @@ function syncFromState() {
   document.querySelectorAll('[data-text-align]').forEach((btn) => {
     btn.classList.toggle('active', (typography.textAlign || 'left') === btn.dataset.textAlign);
   });
+
+  // Swatches: destaca o token ativo em cada linha (cor do texto, cor de fundo).
+  refreshSwatches(text);
 }
 
 function emitStyle(style) {
   if (!currentKey) return;
   bus.emit('text:style', { id: currentKey, style });
+}
+
+function refreshSwatches(text) {
+  const typoRow = document.querySelector('#text-style-panel [data-swatch-target="typography"]');
+  const bgRow   = document.querySelector('#text-style-panel [data-swatch-target="background"]');
+  const typo = text.style?.typography || {};
+  const bg   = text.style?.background || {};
+  renderBrandSwatches(typoRow, {
+    activeToken: typo.colorToken || null,
+    onPick: (token) => emitStyle({ typography: { colorToken: token, customColor: '' } }),
+  });
+  renderBrandSwatches(bgRow, {
+    activeToken: bg.colorToken || null,
+    includeNone: true,
+    onPick: (token) => emitStyle({ background: { colorToken: token, customColor: '' } }),
+  });
 }
 
 export function initTextStylePanel() {
@@ -112,16 +134,22 @@ export function initTextStylePanel() {
   // setState) — mesmo padrão de guarda de foco de app/editor/texts-panel.js
   // (isFocused/updateItemInPlace), pra não atropelar o usuário digitando/arrastando.
   bus.on('state:changed', syncFromState);
+  // Se os temas terminarem de carregar depois da 1ª pintura, os swatches ainda estão
+  // vazios — reemitir syncFromState pinta-os assim que a lista de tokens existir.
+  themes.ready.then(syncFromState);
 
   document.getElementById('text-style-color').addEventListener('input', (e) => {
-    emitStyle({ typography: { color: e.target.value } });
+    // Cor manual "vence" o token — escrevemos ambos para que o renderer use custom,
+    // mas mantemos colorToken null explícito para deixar claro que o usuário optou por
+    // uma cor fora da paleta.
+    emitStyle({ typography: { customColor: e.target.value, colorToken: null } });
   });
 
   document.getElementById('text-style-bg-color').addEventListener('input', (e) => {
-    emitStyle({ background: { color: e.target.value } });
+    emitStyle({ background: { customColor: e.target.value, colorToken: null } });
   });
   document.getElementById('text-style-bg-clear').addEventListener('click', () => {
-    emitStyle({ background: { color: '' } });
+    emitStyle({ background: { customColor: '', colorToken: null, color: '' } });
   });
 
   document.getElementById('text-style-bg-radius').addEventListener('input', (e) => {
