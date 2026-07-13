@@ -1,0 +1,31 @@
+# Tipografia do tema. `family` é o nome usado em @font-face; `stack` cai como
+# fallback se a família não carregar. `sources[]` é ignorado quando `googleFontsUrl`
+# está presente (formato usado pelos outros temas).
+
+display:
+  family: Bricolage
+  stack: "'Bricolage Grotesque', system-ui, sans-serif"
+  sources:
+    - weight: 700
+      url: "design-system/assets/fonts/BricolageGrotesque-Bold.ttf"
+      format: truetype
+
+body:
+  family: Instrument
+  stack: "'Work Sans', system-ui, sans-serif"
+  sources:
+    - weight: 400
+      url: "design-system/assets/fonts/InstrumentSans-Regular.ttf"
+      format: truetype
+    - weight: 700
+      style: italic
+      url: "design-system/assets/fonts/InstrumentSans-BoldItalic.ttf"
+      format: truetype
+
+mono:
+  family: PlexMono
+  stack: "'IBM Plex Mono', monospace"
+  sources:
+    - weight: 400
+      url: "design-system/assets/fonts/IBMPlexMono-Regular.ttf"
+      format: truetype
