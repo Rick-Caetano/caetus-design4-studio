@@ -20,6 +20,10 @@ export const formatConfig = {
 export const defaultState = {
   format: '1:1',
   template: 'minimal',
+  // BrandTheme ativo — identidade visual da MARCA (paleta+tipografia), não do editor.
+  // Ver design-system/themes/ e app/canvas/brand-theme.js. Textos/objetos guardam
+  // tokens semânticos (accent/fg/surface…) que se resolvem contra este tema em runtime.
+  brandTheme: 'caetus',
   // Textos: cada item é `{ id, type, category, label, value, style }`. O item
   // `brandName` (nome da marca, "CAETUS SYSTEMS") é tratado como QUALQUER OUTRO
   // texto — sem exceção. Reset dele restaura só transform, nunca o conteúdo.
@@ -63,8 +67,9 @@ export const defaultState = {
       label: 'Categoria',
       value: 'TECNOLOGIA & EFICIÊNCIA',
       style: {
-        typography: { color: '#021434' },
-        background: { color: '#FFFFFF' },
+        // Tokens de marca (ver design-system/themes/): trocar de tema repinta.
+        typography: { colorToken: 'fg' },
+        background: { colorToken: 'surface' },
         border: { radius: 0 },
       },
     },
@@ -75,7 +80,7 @@ export const defaultState = {
       label: 'Nome da Marca',
       value: 'CAETUS SYSTEMS',
       style: {
-        typography: { color: '#021434', fontSize: 16, fontWeight: 700 },
+        typography: { colorToken: 'fg', fontSize: 16, fontWeight: 700 },
         background: {},
         border: {},
       },
