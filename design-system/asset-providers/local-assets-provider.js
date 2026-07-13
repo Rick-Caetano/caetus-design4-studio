@@ -99,6 +99,7 @@ async function loadElementCategory(folder) {
   const text = await fetchText(`${ROOT}/elements/${folder}/index.md`);
   return parseEntries(text).map((entry) => {
     const path = `${ROOT}/elements/${folder}/${entry.file}`;
+    const isSvg = /\.svg$/i.test(entry.file || '');
     return {
       id: `local-elements-${entry.id || entry.file}`,
       type: 'image',
@@ -107,6 +108,14 @@ async function loadElementCategory(folder) {
       preview: path,
       src: path,
       tags: Array.isArray(entry.tags) ? entry.tags : [],
+      // Marco 4: metadados de recoloração. Heurística — todo SVG é considerado
+      // recolorable e suportando fill+stroke por padrão. Índices futuros podem
+      // sobrescrever com `recolorable: false` para logotipos multi-color, ou
+      // `supports_fill: false` para desligar um dos lados.
+      format: isSvg ? 'svg' : 'bitmap',
+      recolorable: entry.recolorable !== undefined ? entry.recolorable === 'true' : isSvg,
+      supportsFill:  entry.supports_fill  !== undefined ? entry.supports_fill  === 'true' : isSvg,
+      supportsStroke: entry.supports_stroke !== undefined ? entry.supports_stroke === 'true' : isSvg,
       metadata: {
         source: entry.source,
         author: entry.author,

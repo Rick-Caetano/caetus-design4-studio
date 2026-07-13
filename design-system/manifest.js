@@ -10,6 +10,7 @@ import { silencio, whatsapp, tempo } from './presets.js';
 import { templates } from './templates.js';
 import { componentsRegistry, componentDefaults } from './components-registry.js';
 import assetLibrary from './asset-library.js';
+import brandThemes from './themes/index.js';
 
 export default {
   meta,
@@ -23,6 +24,9 @@ export default {
   componentsRegistry,
   componentDefaults,
   assetLibrary,
+  // BrandThemes (Marco 3): pastas em design-system/themes/<key>/ carregadas via YAML.
+  // Ver app/canvas/brand-theme.js para aplicação e app/editor/tema-panel.js para UI.
+  brandThemes,
   assets: {
     fonts: {
       bricolageBold: 'design-system/assets/fonts/BricolageGrotesque-Bold.ttf',

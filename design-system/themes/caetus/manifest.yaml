@@ -1,0 +1,8 @@
+# BrandTheme "Caetus" — identidade visual padrão da Caetus Systems.
+#
+# Formato compartilhado com Open Design e Caetus Video: um tema é uma pasta com
+# manifest.yaml + colors.yaml + typography.yaml. Nenhum código; apenas dados.
+
+key: caetus
+label: Caetus (padrão)
+description: Identidade visual da Caetus Systems — azul elétrico, tipografia Bricolage + Instrument.

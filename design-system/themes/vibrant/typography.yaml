@@ -1,0 +1,13 @@
+googleFontsUrl: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;600;700&display=swap"
+
+display:
+  family: "Space Grotesk"
+  stack: "system-ui, sans-serif"
+
+body:
+  family: "Inter"
+  stack: "system-ui, sans-serif"
+
+mono:
+  family: "Inter"
+  stack: "monospace"

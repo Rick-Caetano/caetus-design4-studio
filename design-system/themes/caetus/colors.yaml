@@ -1,0 +1,11 @@
+# Tokens semânticos de cor. Textos e objetos guardam SÓ o nome do token
+# (accent, fg, surface...) — a cor resolvida vem daqui em runtime, então trocar
+# de brandTheme repinta a arte inteira sem editar o documento.
+
+tokens:
+  bg:      "oklch(98.5% 0.002 250)"
+  surface: "oklch(100% 0 0)"
+  fg:      "oklch(15% 0.05 258)"
+  accent:  "oklch(46% 0.24 258)"
+  muted:   "oklch(45% 0.015 250)"
+  border:  "oklch(93% 0.008 250)"

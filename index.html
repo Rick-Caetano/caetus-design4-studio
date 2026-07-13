@@ -13,6 +13,11 @@
        html2canvas nesta sprint (ver docs/ARCHITECTURE.md). -->
   <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
 
+  <!-- js-yaml: parser YAML usado pelos temas de marca (design-system/themes/<tema>/*.yaml).
+       Estrutura de dados compartilhada com Open Design/Caetus Video — formato YAML é o
+       contrato, não implementação. Ver app/canvas/brand-theme.js. -->
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
   <link rel="stylesheet" href="styles/base.css">
   <link rel="stylesheet" href="design-system/tokens.css">
   <link rel="stylesheet" href="styles/layout.css">
@@ -166,6 +171,18 @@
 
         <!-- TAB: MARCA (logo + tag de categoria) -->
         <div class="sidebar-tab-section p-6 space-y-4" data-tab-section="marca" hidden>
+
+          <!-- Temas de marca (Marco 3): grid de cards com preview de tipografia + paleta +
+               componentes. Ver app/editor/tema-panel.js e design-system/themes/. -->
+          <div class="control-card">
+            <div class="control-card-title">Tema da marca</div>
+            <div class="control-card-body">
+              <p class="text-[11px] text-gray-400">
+                Trocar o tema atualiza cores e tipografia de qualquer texto/objeto que use tokens da marca (accent, fg, surface…). Cores manuais são preservadas.
+              </p>
+              <div id="tema-grid" class="tema-grid"></div>
+            </div>
+          </div>
 
           <div class="control-card">
             <div class="control-card-title">Logo</div>
@@ -349,18 +366,29 @@
           <span id="text-style-panel-label">Texto</span>
         </div>
         <div class="text-style-panel-body">
+          <!-- Swatches de tokens da marca. Clicar aplica colorToken (e limpa customColor)
+               — trocar o brandTheme repinta automaticamente. Botão "Cor livre" abre o
+               input <color> abaixo para gravar customColor. -->
+          <div>
+            <label class="control-label">Cor do texto (tema)</label>
+            <div class="brand-swatch-row" data-swatch-target="typography"></div>
+          </div>
           <div class="text-style-row">
             <div>
-              <label class="control-label">Cor do texto</label>
+              <label class="control-label">Cor livre do texto</label>
               <input type="color" id="text-style-color" class="w-full h-9 rounded border border-[#334155]">
             </div>
             <div>
-              <label class="control-label">Cor de fundo</label>
+              <label class="control-label">Cor livre de fundo</label>
               <div class="text-style-bg-row">
                 <input type="color" id="text-style-bg-color" class="w-full h-9 rounded border border-[#334155]">
                 <button type="button" id="text-style-bg-clear" class="text-style-btn" title="Remover fundo">✕</button>
               </div>
             </div>
+          </div>
+          <div>
+            <label class="control-label">Fundo (tema)</label>
+            <div class="brand-swatch-row" data-swatch-target="background"></div>
           </div>
 
           <div id="text-style-radius-wrap" class="hidden">
@@ -388,6 +416,35 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Painel flutuante de estilo de OBJETO (SVG recolorable). Marco 4 v1: cores de
+           fill/stroke via tokens ou custom. Ver app/editor/object-style-panel.js. -->
+      <div id="object-style-panel" class="text-style-panel hidden">
+        <div class="text-style-panel-header">
+          <span id="object-style-panel-label">Objeto</span>
+        </div>
+        <div class="text-style-panel-body">
+          <div id="object-style-fill-wrap">
+            <label class="control-label">Preenchimento (tema)</label>
+            <div class="brand-swatch-row" data-swatch-target="fill"></div>
+            <div class="text-style-bg-row" style="margin-top:6px;">
+              <input type="color" id="object-style-fill-custom" class="w-full h-9 rounded border border-[#334155]">
+              <button type="button" id="object-style-fill-clear" class="text-style-btn" title="Voltar ao original do SVG">✕</button>
+            </div>
+          </div>
+          <div id="object-style-stroke-wrap">
+            <label class="control-label">Contorno (tema)</label>
+            <div class="brand-swatch-row" data-swatch-target="stroke"></div>
+            <div class="text-style-bg-row" style="margin-top:6px;">
+              <input type="color" id="object-style-stroke-custom" class="w-full h-9 rounded border border-[#334155]">
+              <button type="button" id="object-style-stroke-clear" class="text-style-btn" title="Voltar ao original do SVG">✕</button>
+            </div>
+          </div>
+          <p id="object-style-nosupport" class="text-[11px] text-gray-400 hidden">
+            Este objeto não suporta recoloração (bitmap ou SVG sem cores editáveis).
+          </p>
         </div>
       </div>
 

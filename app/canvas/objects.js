@@ -45,6 +45,19 @@ function insertObject(assetId) {
     category: asset.category,
     src: asset.src,
     opacity: 1,
+    // Metadados de recoloração vindos do asset. `format` (svg|bitmap) + `recolorable`
+    // (assets podem ser SVG mas sem cores editáveis — logotipos multi-color) decidem
+    // se o renderer inlina o SVG. `supportsFill`/`supportsStroke` gatilham a UI de
+    // fill/stroke no painel de objeto. Cor da instância começa null → renderer usa
+    // as cores originais do arquivo.
+    format: asset.format || 'bitmap',
+    recolorable: !!asset.recolorable,
+    supportsFill: !!asset.supportsFill,
+    supportsStroke: !!asset.supportsStroke,
+    fillToken: null,
+    fillCustom: null,
+    strokeToken: null,
+    strokeCustom: null,
   };
   // Leve cascateamento, mesmo padrão de app/canvas/text.js (addText), para não empilhar
   // todo objeto novo exatamente no mesmo canto.
@@ -105,5 +118,15 @@ bus.on('object:duplicate', ({ id }) => {
   const newId = duplicateObject(id);
   if (newId) select(newId);
 });
+
+// Patch de estilo do objeto (Marco 4). Merge raso das chaves de cor. `null` grava null
+// (limpa o valor); undefined mantém o atual.
+function updateObjectStyle(id, patch) {
+  const { objects } = getState();
+  setState({
+    objects: objects.map((o) => (o.id === id ? { ...o, ...patch } : o)),
+  });
+}
+bus.on('object:style', ({ id, style }) => updateObjectStyle(id, style));
 
 export { getObjects, getObject, insertObject, removeObject, duplicateObject };
