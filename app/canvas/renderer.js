@@ -13,6 +13,8 @@ import { getState, setState } from './state.js';
 import { formatTextHighlight } from './text.js';
 import { computeParticipants, ensureOrder, PINNED_BOTTOM } from './layers.js';
 import { isEditingText } from './selection.js';
+import { resolveColor } from './brand-theme.js';
+import { getSvg, applyColors } from './svg-cache.js';
 
 let lastRenderedTemplate = null;
 
@@ -30,15 +32,30 @@ function resolveBgSrc(state) {
 
 function applyTextStyleToNode(node, text) {
   const { typography = {}, background = {}, border = {} } = text.style || {};
-  node.style.color = typography.color || '';
+  // Cor via token da marca (colorToken) ou override manual (customColor). `color`
+  // legado ainda funciona como fallback para posts salvos antes do Marco 3.
+  node.style.color = resolveColor({
+    colorToken: typography.colorToken,
+    customColor: typography.customColor,
+    legacyColor: typography.color,
+  });
   node.style.fontSize = typography.fontSize ? typography.fontSize + 'px' : '';
   node.style.fontWeight = typography.fontWeight || '';
   node.style.textAlign = typography.textAlign || '';
-  node.style.backgroundColor = background.color || '';
+  const bg = resolveColor({
+    colorToken: background.colorToken,
+    customColor: background.customColor,
+    legacyColor: background.color,
+  });
+  node.style.backgroundColor = bg;
   node.style.borderRadius = border.radius !== undefined && border.radius !== '' ? border.radius + 'px' : '';
-  node.style.borderColor = border.color || '';
+  node.style.borderColor = resolveColor({
+    colorToken: border.colorToken,
+    customColor: border.customColor,
+    legacyColor: border.color,
+  });
   node.style.borderWidth = border.width ? border.width + 'px' : '';
-  node.style.padding = background.color ? '4px 8px' : '';
+  node.style.padding = bg ? '4px 8px' : '';
 }
 
 function fillTextNode(node, text) {
@@ -98,17 +115,59 @@ function applyFreeNodes(state, entry) {
 
     const obj = objectsById.get(id);
     let node = container.querySelector(`[data-editable="${id}"]`);
+    // SVG recolorable → node é <div> com o SVG inline dentro (necessário para aplicar
+    // fill/stroke via attribute/currentColor). Bitmap/PNG/JPG segue como <img>.
+    const wantsInline = obj.format === 'svg' && obj.recolorable;
+    const currentKind = node ? node.dataset.objectRender : null;
+    if (node && currentKind !== (wantsInline ? 'svg' : 'img')) {
+      node.remove();
+      node = null;
+    }
     if (!node) {
-      node = document.createElement('img');
+      node = document.createElement(wantsInline ? 'div' : 'img');
       node.dataset.editable = id;
       node.className = 'canvas-free-node';
       node.dataset.freeKind = 'object';
+      node.dataset.objectRender = wantsInline ? 'svg' : 'img';
       container.appendChild(node);
     }
-    if (node.src !== obj.src) node.src = obj.src;
-    node.alt = obj.category || '';
+    if (wantsInline) {
+      applyInlineSvg(node, obj);
+    } else {
+      if (node.src !== obj.src) node.src = obj.src;
+      node.alt = obj.category || '';
+    }
     node.style.opacity = obj.opacity;
   });
+}
+
+// Insere/atualiza um SVG inline dentro de um <div> container, aplicando cores. Para
+// evitar re-fetch em cada state:changed, guarda a URL da última fonte pintada no
+// próprio nó (data-svg-src) e só refaz o innerHTML quando muda.
+async function applyInlineSvg(node, obj) {
+  const currentSrc = node.dataset.svgSrc;
+  const fill = resolveColor({ colorToken: obj.fillToken, customColor: obj.fillCustom });
+  const stroke = resolveColor({ colorToken: obj.strokeToken, customColor: obj.strokeCustom });
+  if (currentSrc === obj.src) {
+    const svgEl = node.querySelector('svg');
+    if (svgEl) applyColors(svgEl, {
+      fill: fill || null,
+      stroke: stroke || null,
+    });
+    return;
+  }
+  const template = await getSvg(obj.src);
+  if (!template) return;
+  const clone = template.cloneNode(true);
+  clone.removeAttribute('width');
+  clone.removeAttribute('height');
+  clone.style.width = '100%';
+  clone.style.height = '100%';
+  clone.style.display = 'block';
+  applyColors(clone, { fill: fill || null, stroke: stroke || null });
+  node.innerHTML = '';
+  node.appendChild(clone);
+  node.dataset.svgSrc = obj.src;
 }
 
 // Componentes reutilizáveis do Design System (state.components). Cada instância vira
