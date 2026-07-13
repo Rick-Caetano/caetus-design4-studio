@@ -17,6 +17,9 @@ import { initFundoPanel } from './editor/fundo-panel.js';
 import { initImagensModal } from './editor/imagens-modal.js';
 import { initElementosPanel } from './editor/elementos-panel.js';
 import { initSettingsModal } from './editor/settings-modal.js';
+import { initTemaPanel } from './editor/tema-panel.js';
+import { initObjectStylePanel } from './editor/object-style-panel.js';
+import { initBrandTheme } from './canvas/brand-theme.js';
 
 // Módulos do canvas se registram no bus (ações → setState) como efeito colateral da
 // importação. render() em renderer.js é o único que escreve no DOM do canvas.
@@ -59,6 +62,9 @@ function bootstrap() {
   initImagensModal();
   initElementosPanel();
   initSettingsModal();
+  initTemaPanel();
+  initObjectStylePanel();
+  initBrandTheme();
   initSidebarChrome();
   initFullscreen();
   initShortcuts();
