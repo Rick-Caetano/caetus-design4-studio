@@ -1,0 +1,39 @@
+@font-face {
+  font-family: "Bricolage";
+  src: url("assets/fonts/BricolageGrotesque-Bold.ttf") format("truetype");
+  font-weight: 700;
+}
+@font-face {
+  font-family: "Instrument";
+  src: url("assets/fonts/InstrumentSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "Instrument";
+  src: url("assets/fonts/InstrumentSans-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
+  font-family: "PlexMono";
+  src: url("assets/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+}
+
+:root {
+  /* Sprint 2: revertido de hex para oklch(). O workaround em hex existia só porque
+     html2canvas@1.4.1 reimplementa CSS em vez de rasterizar com o browser e não
+     reconhecia oklch(). A exportação migrou para html-to-image (SVG <foreignObject>,
+     rasterização nativa do browser), que renderiza oklch() normalmente — validado em
+     docs/ARCHITECTURE.md. */
+  --bg: oklch(98.5% 0.002 250);
+  --surface: oklch(100% 0 0);
+  --fg: oklch(15% 0.05 258);
+  --accent: oklch(46% 0.24 258);
+  --muted: oklch(45% 0.015 250);
+  --border: oklch(93% 0.008 250);
+
+  --font-display: "Bricolage", 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: "Instrument", 'Work Sans', system-ui, sans-serif;
+  --font-mono: "PlexMono", 'IBM Plex Mono', monospace;
+}

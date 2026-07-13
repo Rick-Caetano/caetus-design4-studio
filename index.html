@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Caetus Systems — Instagram Post Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Tailwind CSS for the Editor Sidebar -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- html-to-image: exportação PNG via SVG foreignObject (rasterização nativa do
+       browser) — ver app/canvas/export/providers/html-to-image-provider.js. Substituiu
+       html2canvas nesta sprint (ver docs/ARCHITECTURE.md). -->
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="design-system/tokens.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="design-system/components.css">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- LEFT PANEL: TWEAKS EDITOR -->
+    <div id="app-sidebar" class="max-h-screen overflow-y-auto bg-[#111827] border-r border-[#1f2937] flex flex-col">
+      <div class="p-6 border-b border-[#1f2937] sidebar-header">
+        <div class="sidebar-header-top">
+          <img id="brand-header-logo" class="header-logo" src="design-system/assets/images/caetus_logo_no_bg.png" alt="">
+          <div class="sidebar-header-titles">
+            <h2 class="sidebar-header-title">Caetus Studio</h2>
+            <span class="sidebar-header-subtitle" id="brand-company-name" style="color: var(--accent)">Caetus Systems</span>
+          </div>
+        </div>
+        <div class="sidebar-header-meta">
+          <span class="sidebar-header-badge bg-[#0f50e2]/20 text-[#3b82f6] text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">v1.1</span>
+          <button id="btn-open-settings" class="sidebar-collapse-btn" title="Configurações">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          </button>
+          <button id="btn-sidebar-collapse" class="sidebar-collapse-btn" title="Recolher painel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="sidebar-body flex flex-1 min-h-0">
+
+      <!-- Icon rail: mini-canvas style, cada aba mostra uma seção do painel -->
+      <nav id="sidebar-tab-rail" class="sidebar-tab-rail">
+        <button type="button" class="sidebar-tab-btn" data-tab="modelos" title="Modelos & Layout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+          <span>Modelos</span>
+        </button>
+        <button type="button" class="sidebar-tab-btn" data-tab="marca" title="Marca & Logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.57 3H5.25A2.25 2.25 0 0 0 3 5.25v4.32c0 .6.24 1.17.66 1.59l9.58 9.58c.7.7 1.78.87 2.61.33a18.1 18.1 0 0 0 5.22-5.22c.54-.83.37-1.91-.33-2.61L11.16 3.66A2.25 2.25 0 0 0 9.57 3Z"></path><circle cx="6.5" cy="6.5" r="0.75" fill="currentColor" stroke="none"></circle></svg>
+          <span>Marca</span>
+        </button>
+        <button type="button" class="sidebar-tab-btn" data-tab="fundo" title="Imagens">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="1.5"></rect><circle cx="8.5" cy="9.5" r="1.75"></circle><path d="M3 16.5l5.16-5.16a2.25 2.25 0 0 1 3.18 0l5.16 5.16"></path><path d="M14 14.5l1.41-1.41a2.25 2.25 0 0 1 3.18 0L21 15.5"></path></svg>
+          <span>Imagens</span>
+        </button>
+        <button type="button" class="sidebar-tab-btn" data-tab="elementos" title="Biblioteca de Elementos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7.5" r="4.5"></circle><rect x="13" y="3.5" width="8" height="8" rx="1.5"></rect><path d="M13.5 20.5l3.5-6 3.5 6h-7Z"></path></svg>
+          <span>Elementos</span>
+        </button>
+        <button type="button" class="sidebar-tab-btn" data-tab="texto" title="Conteúdo do Post">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 14.25V11.6a3.4 3.4 0 0 0-3.4-3.4h-1.5A1.1 1.1 0 0 1 13.5 7.1V5.6a3.4 3.4 0 0 0-3.4-3.4H8.25"></path><path d="M10.5 2.25H5.6C5 2.25 4.5 2.75 4.5 3.37v17.25c0 .62.5 1.13 1.13 1.13h12.75c.62 0 1.12-.51 1.12-1.13V11.25a9 9 0 0 0-9-9Z"></path><path d="M8.25 13.5h7.5M8.25 16.5h7.5M8.25 19.5H12"></path></svg>
+          <span>Texto</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-tab-panel flex-1 flex flex-col min-h-0">
+      <div class="flex-1 overflow-y-auto min-h-0">
+
+        <!-- TAB: MODELOS (presets, formato, layout, faixa/padrão) -->
+        <div class="sidebar-tab-section p-6 space-y-4" data-tab-section="modelos">
+
+          <div class="control-card">
+            <div class="control-card-title">💡 Presets de conteúdo</div>
+            <div class="control-card-body">
+              <select id="preset-selector" class="control-input bg-[#1f293b] border-[#3b82f6]">
+                <option value="silencio">Pilar: Silêncio Produtivo (Imagem de Fundo)</option>
+                <option value="whatsapp">Dor: WhatsApp Lotado (Misto/Minimalista)</option>
+                <option value="tempo">Valor: Tempo para o que importa (Editorial Split)</option>
+                <option value="custom">-- Customizado / Criar Livre --</option>
+              </select>
+              <p class="text-[11px] text-gray-400">Escolha um preset para pré-carregar conteúdo validado pela marca.</p>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-card-title">📐 Formato de rede social</div>
+            <div class="control-card-body">
+              <div class="grid grid-cols-2 gap-2">
+                <button id="btn-format-1-1" class="py-2 px-2 rounded-lg text-xs font-medium border border-[#3b82f6] bg-[#1e293b] text-white hover:bg-slate-700 transition">1:1 (Feed)</button>
+                <button id="btn-format-9-16" class="py-2 px-2 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition">9:16 (Stories)</button>
+                <button id="btn-format-4-5" class="py-2 px-2 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition">4:5 (Portrait)</button>
+                <button id="btn-format-16-9" class="py-2 px-2 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition">16:9 (Land)</button>
+                <button id="btn-format-1.91-1" class="py-2 px-2 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition col-span-2">1.91:1 (Facebook)</button>
+              </div>
+              <p class="text-[10px] text-gray-400">Redimensiona o canvas para o formato selecionado.</p>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-card-title">Estilo & Layout</div>
+            <div class="control-card-body">
+              <div>
+                <label class="control-label">Modelo de Layout</label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button data-layout-key="minimal" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] bg-[#1e293b] text-white hover:bg-slate-700 transition">Clean</button>
+                  <button data-layout-key="cinematic" class="py-2 px-3 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition">Cinemático</button>
+                  <button data-layout-key="split" class="py-2 px-3 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition">Editorial</button>
+                </div>
+                <button id="btn-templates-modal-open" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Ver todos os modelos →</button>
+                <button id="btn-reset-template" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">↺ Restaurar modelo</button>
+              </div>
+
+              <div class="control-brand-components">
+                <p class="text-[10px] text-gray-400">Componentes da marca — mova, redimensione ou reorganize como qualquer outro elemento no canvas. Nada é fixo. Reset restaura só posição/escala.</p>
+                <div class="control-card-row">
+                  <span class="text-sm font-medium text-white">Faixa Diagonal</span>
+                  <div class="flex items-center gap-2">
+                    <button data-component-toggle="diagonal-band" class="relative inline-flex h-6 w-11 items-center rounded-full bg-[#0F50E2] transition-colors focus:outline-none">
+                      <span data-component-toggle-dot class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                    </button>
+                    <button data-element-reset="diagonal-band" title="Restaurar posição" class="w-7 h-6 rounded-md text-xs text-gray-300 border border-[#334155] hover:bg-slate-700 hover:text-white transition flex items-center justify-center">↺</button>
+                  </div>
+                </div>
+                <div class="control-card-row">
+                  <span class="text-sm font-medium text-white">Faixa Principal</span>
+                  <div class="flex items-center gap-2">
+                    <button data-component-toggle="divider-bar" class="relative inline-flex h-6 w-11 items-center rounded-full bg-[#0F50E2] transition-colors focus:outline-none">
+                      <span data-component-toggle-dot class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                    </button>
+                    <button data-element-reset="divider-bar" title="Restaurar posição" class="w-7 h-6 rounded-md text-xs text-gray-300 border border-[#334155] hover:bg-slate-700 hover:text-white transition flex items-center justify-center">↺</button>
+                  </div>
+                </div>
+                <div class="control-card-row">
+                  <span class="text-sm font-medium text-white">Faixa Footer</span>
+                  <div class="flex items-center gap-2">
+                    <button data-component-toggle="footer-bar" class="relative inline-flex h-6 w-11 items-center rounded-full bg-[#0F50E2] transition-colors focus:outline-none">
+                      <span data-component-toggle-dot class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                    </button>
+                    <button data-element-reset="footer-bar" title="Restaurar posição" class="w-7 h-6 rounded-md text-xs text-gray-300 border border-[#334155] hover:bg-slate-700 hover:text-white transition flex items-center justify-center">↺</button>
+                  </div>
+                </div>
+                <div class="control-card-row">
+                  <span class="text-sm font-medium text-white">Padrão de Marca</span>
+                  <div class="flex items-center gap-2">
+                    <button data-component-toggle="watermark-pattern" class="relative inline-flex h-6 w-11 items-center rounded-full bg-[#0F50E2] transition-colors focus:outline-none">
+                      <span data-component-toggle-dot class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+                    </button>
+                    <button data-element-reset="watermark-pattern" title="Restaurar posição" class="w-7 h-6 rounded-md text-xs text-gray-300 border border-[#334155] hover:bg-slate-700 hover:text-white transition flex items-center justify-center">↺</button>
+                  </div>
+                </div>
+                <!-- "Nome da Marca" NÃO aparece aqui: é um texto normal (state.texts),
+                     editável pela aba Texto como qualquer outro item. Duplicar aqui
+                     confundia (dois lugares controlando a mesma peça) e o reset
+                     genérico a movia para (0,0). -->
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: MARCA (logo + tag de categoria) -->
+        <div class="sidebar-tab-section p-6 space-y-4" data-tab-section="marca" hidden>
+
+          <div class="control-card">
+            <div class="control-card-title">Logo</div>
+            <div class="control-card-body">
+              <div>
+                <label class="control-label">Biblioteca de Logos</label>
+                <input type="text" id="marca-logo-search" class="control-input" placeholder="Buscar logo...">
+                <div id="marca-logo-grid" class="asset-grid"></div>
+                <button id="btn-marca-custom-url-toggle" type="button" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">URL personalizada...</button>
+              </div>
+
+              <div id="custom-logo-url-wrap" class="hidden">
+                <label class="control-label">URL do Logo Personalizado</label>
+                <input type="text" id="custom-logo-url" class="control-input" placeholder="https://exemplo.com/logo.png">
+              </div>
+
+              <div>
+                <label for="logo-upload-file" class="control-label block cursor-pointer w-full py-2 px-3 rounded-lg text-xs font-medium border border-[#3b82f6] bg-[#1e293b] text-white hover:bg-slate-700 transition text-center normal-case tracking-normal">
+                  📁 Carregar arquivo do computador
+                </label>
+                <input type="file" id="logo-upload-file" accept="image/*" class="hidden">
+                <p class="text-[10px] text-gray-400 mt-2">Arraste o logo diretamente no preview para reposicionar.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Marco 2: card "Tag de Categoria (Eyebrow)" removido. O texto `category` de
+               state.texts é agora editado pela aba Texto como qualquer outro item
+               (inclui categoria semântica via <select>). Estilo do chip continua vivo
+               no state e é reaplicado pelo renderer — só a UI redundante saiu. -->
+
+        </div>
+
+        <!-- TAB: IMAGENS (imagem de fundo — Marco 1.5: grid resumido + modal "Ver biblioteca completa") -->
+        <div class="sidebar-tab-section p-6 space-y-4" data-tab-section="fundo" hidden>
+
+          <div class="control-card">
+            <div class="control-card-title">Imagem de Fundo</div>
+            <div class="control-card-body">
+              <div>
+                <div id="fundo-bg-grid" class="asset-grid"></div>
+                <button id="btn-imagens-bg-open" type="button" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Ver biblioteca completa →</button>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                  <button id="btn-fundo-none" type="button" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Nenhuma / Cor sólida</button>
+                  <button id="btn-fundo-custom-url-toggle" type="button" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">URL personalizada...</button>
+                </div>
+              </div>
+
+              <div id="custom-img-url-wrap" class="hidden">
+                <label class="control-label">URL da Imagem Personalizada</label>
+                <input type="text" id="custom-img-url" class="control-input" placeholder="https://exemplo.com/imagem.jpg">
+              </div>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-card-title">Acrescentar Imagem</div>
+            <div class="control-card-body">
+              <div>
+                <div id="imagens-insert-grid" class="asset-grid"></div>
+                <button id="btn-imagens-insert-open" type="button" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Ver biblioteca completa →</button>
+                <p class="text-[10px] text-gray-400 mt-2">Insere a imagem como um objeto no canvas — pode mover, redimensionar e sobrepor sem substituir o fundo.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-card-title">Ajustes</div>
+            <div class="control-card-body">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="control-label">Opacidade</label>
+                  <input type="range" min="0" max="100" value="15" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer" id="bg-opacity">
+                  <span class="text-[11px] text-gray-400 mt-1 block" id="opacity-val">15%</span>
+                </div>
+                <div>
+                  <label class="control-label">Desfoque (Blur)</label>
+                  <input type="range" min="0" max="20" value="0" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer" id="bg-blur">
+                  <span class="text-[11px] text-gray-400 mt-1 block" id="blur-val">0px</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-card">
+            <div class="control-card-title">Posicionamento</div>
+            <div class="control-card-body">
+              <p class="text-[10px] text-gray-400">Arraste a imagem no preview para reposicionar e use a alça do canto para ampliar/reduzir. No Editorial, Ajustar mantém a foto inteira enquanto você move o centro visual.</p>
+              <div class="grid grid-cols-2 gap-2">
+                <button id="btn-bg-fill" data-bg-fit-action title="Preenche todo o canvas cortando o que sobra (Cover)" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Preencher</button>
+                <button id="btn-bg-fit" data-bg-fit-action title="Mostra a imagem inteira, sem cortar (Contain)" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Ajustar</button>
+                <button id="btn-bg-center" data-bg-fit-action title="Centraliza mantendo o zoom atual" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Centralizar</button>
+                <button id="btn-bg-free" data-bg-fit-action title="Volta para o crop manual (arrastar/zoom)" class="py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Livre</button>
+              </div>
+              <button id="btn-bg-reset-position" class="w-full py-2 px-3 rounded-lg text-xs font-medium border border-[#3b82f6] bg-[#1e293b] text-white hover:bg-slate-700 transition">↺ Resetar imagem</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: ELEMENTOS (Sprint 3B — grid da Asset Library, ver app/editor/elementos-panel.js) -->
+        <div class="sidebar-tab-section p-6 space-y-4" data-tab-section="elementos" hidden>
+
+          <div class="control-card">
+            <div class="control-card-title">Biblioteca de Elementos</div>
+            <div class="control-card-body">
+              <input type="text" id="elementos-search" class="control-input" placeholder="Buscar elemento...">
+              <div id="elementos-category-filters" class="elementos-category-filters"></div>
+              <div id="elementos-grid" class="asset-grid"></div>
+              <p class="text-[10px] text-gray-400">Clique em um elemento para inserir no canvas. Selecione, arraste, redimensione, duplique (Ctrl+D) ou exclua (Delete) como qualquer outro elemento do post.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB: TEXTO (lista dinâmica de state.texts — ver app/editor/texts-panel.js) -->
+        <div class="sidebar-tab-section p-6 space-y-4" data-tab-section="texto" hidden>
+
+          <p class="text-[10px] text-gray-400">Dica: Use colchetes [assim] no título para destacar palavras em Azul Elétrico.</p>
+
+          <div id="texts-list" class="space-y-3"></div>
+
+          <button id="btn-add-text" class="w-full py-2 px-3 rounded-lg text-xs font-medium border border-[#3b82f6] bg-[#1e293b] text-white hover:bg-slate-700 transition">
+            + Adicionar Texto
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FOOTER BUTTONS: sempre visível, fora das abas -->
+      <div class="p-6 border-t border-[#1f2937] space-y-3 bg-[#0d1527]">
+        <button id="btn-export" class="w-full bg-[#0F50E2] hover:bg-[#0c40b8] text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path></svg>
+          Exportar
+        </button>
+        <p class="text-[11px] text-center text-gray-400">Escolha formato, resolução e nome do arquivo antes de exportar.</p>
+      </div>
+
+      </div><!-- /.sidebar-tab-panel -->
+      </div><!-- /.sidebar-body -->
+    </div>
+
+    <!-- Resize handle: arrasta para redimensionar a aba lateral -->
+    <div id="sidebar-resize-handle" class="sidebar-resize-handle" title="Arraste para redimensionar"></div>
+
+    <!-- RIGHT PANEL: POST CANVAS PREVIEW -->
+    <div class="post-wrapper">
+
+      <!-- 1080x1080 Canvas Container. Componentes de marca (faixa diagonal, divider,
+           footer bar, padrão de marca) e o nome da marca são instanciados pelo
+           renderer a partir de state.components / state.texts — não têm HTML fixo aqui. -->
+      <div id="post-canvas">
+        <!-- Background Img overlay -->
+        <img id="bg-img" class="watermark-bg" data-editable="background" src="design-system/assets/images/silencio_produtivo_preset_1.jpg" alt="Silêncio Produtivo Background">
+
+        <!-- Render Target Area (o container é reescrito pelo renderer a cada troca de template) -->
+        <div id="post-content-container" class="w-full h-full flex flex-col justify-between"></div>
+
+      </div>
+
+      <!-- Zoom controls -->
+      <div class="zoom-controls">
+        <button id="btn-undo" title="Desfazer (Ctrl+Z)" disabled>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M3 13a9 9 0 1 0 3-6.7L3 9"></path></svg>
+        </button>
+        <button id="btn-redo" title="Refazer (Ctrl+Shift+Z)" disabled>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"></path><path d="M21 13a9 9 0 1 1-3-6.7L21 9"></path></svg>
+        </button>
+        <span class="zoom-controls-divider"></span>
+        <button id="zoom-out-btn" title="Reduzir zoom">−</button>
+        <span id="zoom-level-label">100%</span>
+        <button id="zoom-in-btn" title="Aumentar zoom">+</button>
+        <button id="zoom-fit-btn" title="Ajustar à tela">⤢</button>
+        <span class="zoom-controls-divider"></span>
+        <button id="btn-fullscreen" title="Tela cheia">⛶</button>
+      </div>
+
+      <!-- Painel flutuante de estilo de texto: aparece só com um texto selecionado no
+           canvas (app/editor/text-style-panel.js, ver app/canvas/selection.js). -->
+      <div id="text-style-panel" class="text-style-panel hidden">
+        <div class="text-style-panel-header">
+          <span id="text-style-panel-label">Texto</span>
+        </div>
+        <div class="text-style-panel-body">
+          <div class="text-style-row">
+            <div>
+              <label class="control-label">Cor do texto</label>
+              <input type="color" id="text-style-color" class="w-full h-9 rounded border border-[#334155]">
+            </div>
+            <div>
+              <label class="control-label">Cor de fundo</label>
+              <div class="text-style-bg-row">
+                <input type="color" id="text-style-bg-color" class="w-full h-9 rounded border border-[#334155]">
+                <button type="button" id="text-style-bg-clear" class="text-style-btn" title="Remover fundo">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="text-style-radius-wrap" class="hidden">
+            <label class="control-label">Arredondamento</label>
+            <input type="range" min="0" max="40" value="0" id="text-style-bg-radius" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+          </div>
+
+          <div>
+            <label class="control-label">Tamanho da fonte</label>
+            <input type="range" min="10" max="120" value="24" id="text-style-font-size" class="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+            <span class="text-[11px] text-gray-400" id="text-style-font-size-val">24px</span>
+          </div>
+
+          <div class="text-style-row">
+            <button type="button" id="text-style-bold" class="text-style-btn" title="Negrito"><b>B</b></button>
+            <div class="text-style-align-group">
+              <button type="button" data-text-align="left" class="text-style-btn" title="Alinhar à esquerda">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="15" y2="12"></line><line x1="3" y1="18" x2="18" y2="18"></line></svg>
+              </button>
+              <button type="button" data-text-align="center" class="text-style-btn" title="Centralizar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="5" y1="18" x2="19" y2="18"></line></svg>
+              </button>
+              <button type="button" data-text-align="right" class="text-style-btn" title="Alinhar à direita">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="9" y1="12" x2="21" y2="12"></line><line x1="6" y1="18" x2="21" y2="18"></line></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Templates Modal -->
+  <div id="templates-modal" class="templates-modal hidden">
+    <div id="templates-modal-backdrop" class="templates-modal-backdrop"></div>
+    <div class="templates-modal-panel">
+      <div class="templates-modal-header">
+        <h3>Modelos de Layout</h3>
+        <input type="text" id="templates-search" class="control-input" placeholder="Buscar modelo...">
+        <button id="templates-modal-close" title="Fechar">✕</button>
+      </div>
+      <div id="templates-category-filters" class="templates-category-filters"></div>
+      <div id="templates-grid" class="templates-grid"></div>
+    </div>
+  </div>
+
+  <!-- Imagens de Fundo — Biblioteca Completa -->
+  <div id="imagens-bg-modal" class="templates-modal hidden">
+    <div class="templates-modal-backdrop" data-imagens-close="bg"></div>
+    <div class="templates-modal-panel">
+      <div class="templates-modal-header">
+        <h3>Biblioteca de Imagens de Fundo</h3>
+        <div style="flex:1"></div>
+        <button data-imagens-close="bg" title="Fechar">✕</button>
+      </div>
+      <div id="imagens-bg-grid" class="asset-grid asset-grid-lg"></div>
+    </div>
+  </div>
+
+  <!-- Acrescentar Imagem — Biblioteca Completa -->
+  <div id="imagens-insert-modal" class="templates-modal hidden">
+    <div class="templates-modal-backdrop" data-imagens-close="insert"></div>
+    <div class="templates-modal-panel">
+      <div class="templates-modal-header">
+        <h3>Acrescentar Imagem ao Canvas</h3>
+        <div style="flex:1"></div>
+        <button data-imagens-close="insert" title="Fechar">✕</button>
+      </div>
+      <div id="imagens-insert-modal-grid" class="asset-grid asset-grid-lg"></div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="export-modal" class="export-modal hidden">
+    <div id="export-modal-backdrop" class="export-modal-backdrop"></div>
+    <div class="export-modal-panel">
+      <div class="export-modal-header">
+        <h3>Exportar</h3>
+        <button id="export-modal-close" title="Fechar">✕</button>
+      </div>
+
+      <div class="export-modal-body">
+        <div class="export-modal-section">
+          <label class="control-label">Formato do arquivo</label>
+          <div class="export-format-grid">
+            <button type="button" class="export-format-btn active" data-export-format="png">PNG</button>
+            <button type="button" class="export-format-btn" data-export-format="jpg" disabled title="Em breve">JPG<span class="export-badge-soon">em breve</span></button>
+            <button type="button" class="export-format-btn" data-export-format="webp" disabled title="Em breve">WEBP<span class="export-badge-soon">em breve</span></button>
+          </div>
+        </div>
+
+        <div class="export-modal-section">
+          <label class="control-label">Resolução</label>
+          <div id="export-resolution-grid" class="export-resolution-grid"></div>
+        </div>
+
+        <div id="export-custom-fields" class="export-modal-section hidden">
+          <label class="control-label">Dimensões personalizadas (px)</label>
+          <div class="export-custom-dims">
+            <input type="number" id="export-custom-width" class="control-input" min="1" placeholder="Largura">
+            <span>×</span>
+            <input type="number" id="export-custom-height" class="control-input" min="1" placeholder="Altura">
+          </div>
+        </div>
+
+        <div class="export-modal-section">
+          <label class="control-label">Nome do arquivo</label>
+          <input type="text" id="export-filename" class="control-input" placeholder="nome-do-arquivo">
+        </div>
+      </div>
+
+      <div class="export-modal-footer">
+        <div id="export-status" class="export-status" aria-live="polite"></div>
+        <button id="export-modal-submit" class="export-submit-btn">Exportar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Configurações (app/editor/settings-modal.js) — Sprint 3A: estrutura,
+       só Tema tem alguma leitura/escrita real (via app/config/ConfigService.js). -->
+  <div id="settings-modal" class="export-modal hidden">
+    <div id="settings-modal-backdrop" class="export-modal-backdrop"></div>
+    <div class="export-modal-panel">
+      <div class="export-modal-header">
+        <h3>Configurações</h3>
+        <button id="settings-modal-close" title="Fechar">✕</button>
+      </div>
+
+      <div class="export-modal-body">
+        <div class="export-modal-section">
+          <label class="control-label">Tema</label>
+          <div class="settings-option-row">
+            <label class="settings-radio-label">
+              <input type="radio" name="settings-theme" data-theme-option="caetus">
+              Caetus (padrão)
+            </label>
+            <label class="settings-radio-label settings-option-disabled">
+              <input type="radio" name="settings-theme" data-theme-option="design-system" disabled>
+              Design System da empresa <span class="export-badge-soon">em breve</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="export-modal-section">
+          <label class="control-label">Idioma</label>
+          <select class="control-input" disabled>
+            <option>Português (Brasil)</option>
+          </select>
+        </div>
+
+        <div class="export-modal-section">
+          <label class="control-label">Preferências</label>
+          <p class="text-[11px] text-gray-400">Em breve.</p>
+        </div>
+
+        <div class="export-modal-section">
+          <label class="control-label">Sobre</label>
+          <p id="settings-about-text" class="text-[11px] text-gray-400"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,985 @@
+/* Outer Wrapper */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Sidebar: recolhimento e redimensionamento (app/ui/sidebar.js) */
+#app-sidebar {
+  width: 450px;
+  flex-shrink: 0;
+  transition: width 0.18s ease;
+}
+
+/* Cabeçalho em duas linhas: logo+título (largura livre, nunca disputa espaço com
+   versão/configurações/recolher) na linha de cima, meta (badge/engrenagem/seta)
+   alinhada à direita na linha de baixo — ver index.html. Evita o antigo "espaço
+   apertado" quando tudo dividia uma única linha flex. */
+.sidebar-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.sidebar-header-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sidebar-header-titles {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.sidebar-header-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-header-subtitle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.sidebar-collapse-btn {
+  background: none;
+  border: 1px solid #1f2937;
+  color: #9ca3af;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.18s ease;
+}
+.sidebar-collapse-btn:hover {
+  color: white;
+  border-color: #3b82f6;
+}
+.sidebar-collapse-btn:focus-visible,
+#btn-fullscreen:focus-visible,
+.zoom-controls button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+.sidebar-collapse-btn svg {
+  width: 15px;
+  height: 15px;
+}
+.sidebar-collapse-btn.is-collapsed svg {
+  transform: rotate(180deg);
+}
+
+.sidebar-collapsed .sidebar-header-top,
+.sidebar-collapsed .sidebar-header-badge,
+.sidebar-collapsed .sidebar-body {
+  display: none;
+}
+.sidebar-collapsed .sidebar-header-meta {
+  justify-content: center;
+}
+
+/* Icon rail lateral (estilo Canva): cada aba mostra uma seção do painel (app/ui/sidebar-tabs.js) */
+.sidebar-tab-rail {
+  width: 76px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 12px 8px;
+  background: #0d1527;
+  border-right: 1px solid #1f2937;
+  overflow-y: auto;
+}
+.sidebar-tab-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 4px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sidebar-tab-btn svg {
+  width: 20px;
+  height: 20px;
+}
+.sidebar-tab-btn:hover {
+  background: #1e293b;
+  color: white;
+}
+.sidebar-tab-btn.active {
+  background: #0F50E2;
+  color: white;
+}
+.sidebar-tab-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.sidebar-tab-panel {
+  min-width: 0;
+}
+.sidebar-tab-section[hidden] {
+  display: none;
+}
+
+.sidebar-resize-handle {
+  width: 6px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+}
+.sidebar-resize-handle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: 0 auto;
+  width: 2px;
+  background: #1f2937;
+  transition: background 0.15s ease;
+}
+.sidebar-resize-handle:hover::after {
+  background: #3b82f6;
+}
+
+/* POST CONTAINER (1080x1080) */
+.post-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #080e1c;
+  overflow: auto;
+}
+
+#post-canvas {
+  width: 1080px;
+  height: 1080px;
+  min-width: 1080px;
+  min-height: 1080px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Cards dentro de cada aba da sidebar (index.html + app/ui/sidebar-tabs.js) —
+   agrupamento visual de controles relacionados, evitando listas enormes soltas. */
+.control-card {
+  background: #161f33;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 16px;
+}
+.control-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+.control-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.control-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Botão de modo de fundo ativo (app/canvas/background.js "fit" — Centralizar não altera
+   o modo Livre/Contain/Cover, então não tem um botão "is-active-fit" próprio). */
+[data-bg-fit-action].is-active-fit {
+  border-color: #3b82f6 !important;
+  background: #0F50E2 !important;
+  color: white !important;
+}
+
+/* Sidebar controls styling */
+.control-label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+.control-input {
+  width: 100%;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: white;
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+.control-input:focus {
+  outline: none;
+  border-color: #0F50E2;
+}
+
+/* Zoom controls (canto inferior direito do preview) */
+.zoom-controls {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 999px;
+  padding: 6px 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.zoom-controls button {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.zoom-controls button:hover {
+  background: #334155;
+}
+#zoom-level-label {
+  font-size: 12px;
+  color: #9ca3af;
+  min-width: 42px;
+  text-align: center;
+}
+.zoom-controls-divider {
+  width: 1px;
+  height: 18px;
+  background: #1f2937;
+  margin: 0 2px;
+}
+#btn-fullscreen.is-active {
+  background: #0F50E2;
+  color: white;
+}
+
+/* Seleção de elementos do canvas (app/canvas/selection.js) — moldura + alça de resize.
+   Puro chrome de edição: fica dentro de #post-canvas para herdar o zoom automaticamente,
+   mas é ignorado na exportação PNG (ver ignoreElements em app/canvas/export.js). */
+.selection-overlay {
+  position: absolute;
+  z-index: 999;
+  border: 1.5px solid #3b82f6;
+  pointer-events: none;
+}
+.selection-overlay.hidden {
+  display: none;
+}
+.selection-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #3b82f6;
+  border: 2px solid white;
+  border-radius: 50%;
+  pointer-events: auto;
+  transition: transform 0.12s ease;
+}
+.selection-handle:hover {
+  transform: scale(1.2);
+}
+.selection-handle-se {
+  right: -7px;
+  bottom: -7px;
+  cursor: nwse-resize;
+}
+
+/* Barra de ações do overlay de seleção (Marco 1 v2 — ver app/canvas/selection.js).
+   Redesenho: mais compacta (30px de botão em vez de 34), fundo escuro sólido com
+   borda sutil, cantos suavemente arredondados (não pílula total), sombra mais
+   profunda para descolar do canvas, e grupos visuais claros entre camadas e ações
+   destrutivas. */
+.selection-actions {
+  position: absolute;
+  top: -48px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+.selection-actions[hidden] {
+  display: none;
+}
+/* Quando não há espaço acima da seleção (elemento perto do topo do canvas) — ver
+   ACTIONS_BAR_CLEARANCE em app/canvas/selection.js. */
+.selection-actions.selection-actions-below {
+  top: auto;
+  bottom: -48px;
+}
+.selection-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+.selection-actions-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0 3px;
+}
+.selection-actions-divider[hidden] {
+  display: none;
+}
+.selection-action-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.selection-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.selection-action-btn:hover:not(.is-disabled):not(:disabled) {
+  background: #1e293b;
+  color: white;
+}
+.selection-action-btn:active:not(.is-disabled):not(:disabled) {
+  background: #0F50E2;
+  color: white;
+}
+.selection-action-btn.is-disabled,
+.selection-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.selection-action-btn-danger:hover:not(.is-disabled):not(:disabled) {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+
+[data-editable] {
+  cursor: move;
+  /* Reativa pointer-events para elementos editáveis dentro de .post-content, que fica
+     pointer-events:none para deixar cliques em área vazia passarem para #bg-img
+     (ver design-system/components.css). É herdado pelos filhos (svg, spans, etc). */
+  pointer-events: auto;
+}
+[data-editable="logo"] {
+  cursor: grab;
+}
+[data-editable="logo"]:active {
+  cursor: grabbing;
+}
+[data-editable="background"] {
+  cursor: move;
+}
+
+/* Modal de Templates */
+.templates-modal.hidden {
+  display: none;
+}
+.templates-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.templates-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 20, 0.72);
+}
+.templates-modal-panel {
+  position: relative;
+  width: min(1000px, 92vw);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 24px;
+  gap: 16px;
+  overflow: hidden;
+}
+.templates-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.templates-modal-header h3 {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.templates-modal-header .control-input {
+  flex: 1;
+}
+.templates-modal-header button {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+}
+.templates-modal-header button:hover {
+  color: white;
+}
+.templates-category-filters,
+.elementos-category-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.templates-category-filters button,
+.elementos-category-filters button {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #d1d5db;
+  font-size: 12px;
+  cursor: pointer;
+}
+.templates-category-filters button.active,
+.elementos-category-filters button.active {
+  border-color: #3b82f6;
+  background: #0F50E2;
+  color: white;
+}
+.templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+.template-card {
+  cursor: pointer;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0d1527;
+  transition: border-color 0.15s ease;
+}
+.template-card:hover {
+  border-color: #3b82f6;
+}
+.template-card-thumb {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  position: relative;
+  background: #000;
+}
+.template-card-info {
+  padding: 8px 10px;
+}
+.template-card-label {
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+}
+.template-card-category {
+  color: #9ca3af;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Modal de Exportação (app/editor/export-modal.js) — mesmo padrão visual do modal de
+   templates (backdrop + panel), formulário próprio de ExportOptions. */
+.export-modal.hidden {
+  display: none;
+}
+.export-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.export-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 20, 0.72);
+}
+.export-modal-panel {
+  position: relative;
+  width: min(480px, 92vw);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 24px;
+  gap: 16px;
+  overflow: hidden;
+}
+.export-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.export-modal-header h3 {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+}
+.export-modal-header button {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 6px;
+}
+.export-modal-header button:hover {
+  color: white;
+}
+.export-modal-header button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.export-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+.export-modal-section.hidden {
+  display: none;
+}
+.export-format-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.export-format-btn {
+  position: relative;
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #d1d5db;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.export-format-btn.active {
+  border-color: #3b82f6;
+  background: #0F50E2;
+  color: white;
+}
+.export-format-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.export-badge-soon {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+}
+.export-resolution-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.export-resolution-card {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #d1d5db;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.export-resolution-card.active {
+  border-color: #3b82f6;
+  background: #16305e;
+}
+.export-resolution-card:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.export-resolution-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+.export-resolution-card-sub {
+  font-size: 11px;
+  color: #9ca3af;
+}
+.export-custom-dims {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9ca3af;
+}
+.export-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid #1f2937;
+  padding-top: 16px;
+}
+.export-status {
+  font-size: 12px;
+  color: #9ca3af;
+  flex: 1;
+}
+.export-status.is-success {
+  color: #4ade80;
+}
+.export-status.is-error {
+  color: #f87171;
+}
+.export-submit-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #0F50E2;
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.export-submit-btn:hover:not(:disabled) {
+  background: #0c40b8;
+}
+.export-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Cabeçalho: logo da marca ativa (app/app.js seta o src via manifest.assets — nunca
+   hardcoded aqui) + nome da empresa colorido via var(--accent), definida pelo Design
+   System em design-system/tokens.css. */
+.header-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Asset picker (app/editor/asset-picker.js) — grid reutilizável por Marca/Fundo (e,
+   na Sprint 3B, pela Aba Elementos). CSS própria, não reaproveita .templates-grid/
+   .template-card (que ficam intactos) para não arriscar regressão no modal de
+   templates já validado. */
+.asset-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+/* Marco 1.5: variante usada no modal "Biblioteca de Imagens" — cards maiores para
+   ver detalhes das fotos, e o container rola dentro do modal (max-height fixa). */
+.asset-grid-lg {
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  overflow-y: auto;
+  max-height: 70vh;
+  padding: 4px;
+}
+.asset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #0d1527;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+}
+.asset-card:hover {
+  border-color: #3b82f6;
+}
+.asset-card.active {
+  border-color: #3b82f6;
+  background: #16305e;
+  box-shadow: 0 0 0 2px #3b82f6, 0 8px 20px rgba(59, 130, 246, 0.35);
+}
+.asset-card-thumb {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  /* Neutro claro em vez de preto: a Asset Library agora inclui ícones/elementos
+     transparentes (assets/stock/elements/, ver local-assets-provider.js) que usam
+     stroke/fill escuro por padrão — em fundo preto ficavam invisíveis. Fotos e logos
+     continuam legíveis nesse fundo do mesmo jeito (object-fit: contain). */
+  background: #e2e8f0;
+  overflow: hidden;
+}
+.asset-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.asset-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 8px;
+}
+.asset-card-label {
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.asset-card-category {
+  color: #9ca3af;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.asset-grid-empty {
+  grid-column: 1 / -1;
+  color: #9ca3af;
+  font-size: 12px;
+  padding: 12px 0;
+}
+
+/* Textos livres (app/canvas/renderer.js) — id que não bate com nenhum data-editable
+   fixo do layout atual vira um nó próprio, posicionado por state.elements[id] (mesmo
+   mecanismo genérico de app/canvas/selection.js usado por título/subtítulo/etc.). */
+.canvas-free-node {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 1em;
+  min-height: 1em;
+  font-family: var(--font-body);
+  color: var(--fg);
+  font-size: 24px;
+  white-space: pre-wrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  /* Corrigido na Sprint 4A (achado ao validar Camadas): sem isso, nós livres (z-index
+     auto) ficavam ATRÁS de #bg-img/#watermarks-paral (design-system/components.css,
+     z-index:1) sempre que o fundo tivesse opacidade real — qualquer texto/objeto
+     inserido ficava efetivamente invisível. z-index:5 os coloca acima do fundo/padrão,
+     mas ainda abaixo de #diagonal-band (10) e .post-content (20) — mesmo teto já
+     documentado em docs/ARCHITECTURE.md > "Renderização e ordem — camadas", que este
+     valor não muda: "trazer para frente/enviar para trás" continua só entre nós livres. */
+  z-index: 5;
+}
+
+/* Objetos gráficos livres (Sprint 3B, app/canvas/renderer.js applyFreeNodes) — são
+   <img>, então herdam .canvas-free-node (posição absoluta) mas precisam de um teto de
+   tamanho natural: o resize por arraste (app/canvas/selection.js) escala a partir do
+   tamanho JÁ RENDERIZADO, então este teto só afeta o tamanho inicial de inserção, nunca
+   o comportamento do resize em si. */
+.canvas-free-node[data-free-kind="object"] {
+  max-width: 320px;
+  max-height: 320px;
+  object-fit: contain;
+}
+
+/* Aba Texto (app/editor/texts-panel.js) — um card por item da lista dinâmica. */
+.text-item-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.text-item-row .text-item-label {
+  flex: 1;
+}
+.text-item-remove {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #9ca3af;
+  cursor: pointer;
+}
+.text-item-remove:hover {
+  color: white;
+  border-color: #f87171;
+}
+
+/* Painel flutuante de estilo de texto (app/editor/text-style-panel.js) — visibilidade
+   100% derivada da seleção do canvas (app/canvas/selection.js emite 'selection:changed'),
+   mesmo posicionamento fixo de .zoom-controls, canto oposto. */
+.text-style-panel {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 50;
+  width: 240px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.text-style-panel.hidden {
+  display: none;
+}
+.text-style-panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid #1f2937;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.text-style-panel-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.text-style-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.text-style-bg-row {
+  display: flex;
+  gap: 6px;
+}
+.text-style-bg-row input[type="color"] {
+  flex: 1;
+  min-width: 0;
+}
+.text-style-btn {
+  width: 100%;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #d1d5db;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.text-style-btn:hover {
+  border-color: #3b82f6;
+}
+.text-style-btn.active {
+  border-color: #3b82f6;
+  background: #0F50E2;
+  color: white;
+}
+.text-style-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.text-style-align-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+/* Modal de Configurações (app/editor/settings-modal.js) — reaproveita .export-modal*
+   (mesmo padrão visual, ver docs/ARCHITECTURE.md sobre unificar os modais no futuro). */
+.settings-option-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.settings-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: white;
+}
+.settings-option-disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}

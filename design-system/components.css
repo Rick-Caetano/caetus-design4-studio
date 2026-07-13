@@ -1,0 +1,271 @@
+/* ─── Componentes reutilizáveis do Design System ──────────────────────────────────
+   Todo componente do registry (design-system/components-registry.js) é um bloco
+   absoluto dentro de #post-canvas, com data-editable="{id}" e data-ds-component.
+   Posição/escala vêm de state.elements[id] via transform inline; z-index vem do
+   state.layerOrder unificado. Zero z-index hardcoded por peça. */
+
+.ds-brand-component {
+  position: absolute;
+  transform-origin: top left;
+  pointer-events: auto;
+}
+
+.ds-diagonal-band {
+  left: 0;
+  bottom: 0;
+  width: 92px;
+  height: 620px;
+  background: var(--accent);
+  clip-path: polygon(0 0, 100% 130px, 100% 100%, 0 100%);
+}
+
+.ds-divider-bar {
+  left: 0;
+  top: 0;
+  width: 64px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.ds-footer-bar {
+  left: 96px;
+  bottom: 130px;
+  width: calc(100% - 192px);
+  height: 1px;
+  background: var(--border);
+}
+
+.ds-watermark-pattern {
+  top: 60px;
+  right: -60px;
+  width: 480px;
+  height: 420px;
+  opacity: 0.55;
+}
+
+.ds-watermark-pattern .p1,
+.ds-watermark-pattern .p2 {
+  position: absolute;
+  background: var(--accent);
+  opacity: 0.12;
+}
+
+.ds-watermark-pattern .p1 {
+  width: 320px; height: 260px;
+  top: 0; right: 40px;
+  clip-path: polygon(30% 0, 100% 0, 70% 100%, 0% 100%);
+}
+
+.ds-watermark-pattern .p2 {
+  width: 260px; height: 220px;
+  top: 160px; right: -20px;
+  clip-path: polygon(30% 0, 100% 0, 70% 100%, 0% 100%);
+}
+
+/* Fundo (imagem) — permanece como piso estrutural. Continua com z-index fixo em
+   CSS porque é PINNED_BOTTOM no layerOrder (ver app/canvas/layers.js). */
+.watermark-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  z-index: 1;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+
+/* Content Area — Marco 1 v2: NÃO cria mais stacking context próprio (z-index: auto
+   em vez de 20). Assim, os filhos editáveis (title/subtitle/selo/cta/category/logo)
+   ficam no MESMO stacking context de #post-canvas que os nós livres
+   (.canvas-free-node) — o que permite ao renderer aplicar z-index unificado a
+   qualquer elemento editável (ver applyLayerZIndex em app/canvas/renderer.js).
+   O z-index de cada editável é atribuído por app/canvas/layers.js via state.layerOrder;
+   background segue com z-index: 1 fixo (piso estrutural, pinado no índice 0). */
+.post-content {
+  position: relative;
+  z-index: auto;
+  padding: 92px 96px 64px 96px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Deixa passar cliques nas áreas vazias (fora de texto/logo) para a imagem de fundo
+     por baixo (#bg-img, ver app/canvas/renderer.js), permitindo arrastar/redimensionar
+     o fundo. Elementos editáveis reativam pointer-events (regra abaixo, herdada pelos
+     próprios filhos). */
+  pointer-events: none;
+}
+
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.logo-img {
+  height: 68px;
+  display: block;
+  object-fit: contain;
+  cursor: grab;
+}
+
+.logo-img:active {
+  cursor: grabbing;
+}
+
+.headline-wrap {
+  margin-top: 56px;
+}
+
+h1.post-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1.12;
+  color: var(--fg);
+  letter-spacing: -0.5px;
+  max-width: 840px;
+}
+
+h1.post-title .hl {
+  color: var(--accent);
+}
+
+/* .divider-line foi substituído pelo componente reutilizável `dividerBar`
+   (design-system/components-registry.js). Nada aqui. */
+
+
+h2.post-subtitle {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 28px;
+  line-height: 1.4;
+  color: var(--muted);
+  max-width: 800px;
+}
+
+/* The "Selo" / Seal of Productive Silence */
+.selo-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-top: 48px;
+  max-width: 800px;
+}
+
+.selo-gear {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selo-gear svg {
+  width: 26px;
+  height: 26px;
+  animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.selo-text {
+  font-size: 20px;
+  line-height: 1.45;
+  color: var(--fg);
+  padding-top: 4px;
+}
+
+/* Footer Row — só o container/flex do CTA. O "faixa footer" (border-top) virou
+   o componente reutilizável `footerBar`; o "CAETUS SYSTEMS" virou o texto
+   normal `brandName` (state.texts). */
+.post-footer {
+  margin-top: auto;
+  padding-top: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.footer-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.footer-cta .cta-arrow {
+  width: 14px;
+  height: 18px;
+  background: var(--accent);
+  clip-path: polygon(60% 0, 100% 0, 40% 100%, 0 100%);
+}
+
+/* Layout Mode overrides */
+
+/* 1. Cinematic Layout Style */
+.layout-cinematic {
+  background: var(--fg) !important;
+  color: var(--surface) !important;
+}
+.layout-cinematic .post-title {
+  color: var(--surface);
+}
+.layout-cinematic .post-subtitle {
+  color: oklch(80% 0.01 250);
+}
+.layout-cinematic .selo-text {
+  color: var(--surface);
+}
+.layout-cinematic .footer-cta {
+  color: var(--surface);
+}
+.layout-cinematic .watermark-bg {
+  opacity: 0.35 !important;
+}
+
+
+/* 2. Editorial Split Layout Style */
+.split-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  height: 100%;
+  width: 100%;
+}
+.split-left {
+  padding: 92px 64px 64px 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+.split-right {
+  position: relative;
+  /* Recorta a imagem de fundo (#bg-img, reparentado aqui por app/canvas/renderer.js
+     quando o template tem data-bg-slot) ao tamanho deste painel — necessário porque a
+     imagem pode ser arrastada/ampliada (app/canvas/selection.js) e transbordaria sem
+     isso. */
+  overflow: hidden;
+  border-left: 1px solid var(--border);
+}
+.split-right::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(2, 20, 52, 0.1), transparent);
+  /* Deixa cliques/arraste passarem para a imagem de fundo por baixo (#bg-img,
+     data-editable="background") em vez de serem capturados por este overlay. */
+  pointer-events: none;
+}
