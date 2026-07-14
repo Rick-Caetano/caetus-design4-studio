@@ -25,6 +25,16 @@
 </head>
 <body>
 
+  <!-- Primeira página: seleção de empresa (ver app/editor/empresa-gate.js). Só some
+       depois que a URL tiver ?empresa= — nunca cai direto num ambiente sem escolha. -->
+  <div id="empresa-gate" class="empresa-gate hidden">
+    <div class="empresa-gate-panel">
+      <h1 class="empresa-gate-title">Caetus Studio</h1>
+      <p class="empresa-gate-subtitle">Escolha a empresa para continuar</p>
+      <div id="empresa-gate-grid" class="empresa-gate-grid"></div>
+    </div>
+  </div>
+
   <div class="app-container">
 
     <!-- LEFT PANEL: TWEAKS EDITOR -->
@@ -83,12 +93,9 @@
           <div class="control-card">
             <div class="control-card-title">💡 Presets de conteúdo</div>
             <div class="control-card-body">
-              <select id="preset-selector" class="control-input bg-[#1f293b] border-[#3b82f6]">
-                <option value="silencio">Pilar: Silêncio Produtivo (Imagem de Fundo)</option>
-                <option value="whatsapp">Dor: WhatsApp Lotado (Misto/Minimalista)</option>
-                <option value="tempo">Valor: Tempo para o que importa (Editorial Split)</option>
-                <option value="custom">-- Customizado / Criar Livre --</option>
-              </select>
+              <!-- Populado por app/editor/content-presets.js com os Design Documents
+                   da empresa ativa — nada hardcoded aqui, ver esse módulo. -->
+              <select id="preset-selector" class="control-input bg-[#1f293b] border-[#3b82f6]"></select>
               <p class="text-[11px] text-gray-400">Escolha um preset para pré-carregar conteúdo validado pela marca.</p>
             </div>
           </div>
@@ -118,9 +125,15 @@
                   <button data-layout-key="split" class="py-2 px-3 rounded-lg text-xs font-medium border border-transparent bg-slate-800 text-gray-300 hover:bg-slate-700 transition">Editorial</button>
                 </div>
                 <button id="btn-templates-modal-open" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">Ver todos os modelos →</button>
+                <button id="btn-save-design" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">💾 Salvar como layout</button>
                 <button id="btn-reset-template" class="w-full mt-2 py-2 px-3 rounded-lg text-xs font-medium border border-[#334155] text-gray-300 hover:bg-slate-700 hover:text-white transition">↺ Restaurar modelo</button>
               </div>
+            </div>
+          </div>
 
+          <div class="control-card">
+            <div class="control-card-title">🎨 Padrão da marca</div>
+            <div class="control-card-body">
               <div class="control-brand-components">
                 <p class="text-[10px] text-gray-400">Componentes da marca — mova, redimensione ou reorganize como qualquer outro elemento no canvas. Nada é fixo. Reset restaura só posição/escala.</p>
                 <div class="control-card-row">
@@ -452,14 +465,18 @@
 
   </div>
 
-  <!-- Templates Modal -->
+  <!-- Templates Modal (Design Documents multiempresa: "Meus layouts sob medida" / "Mais layouts") -->
   <div id="templates-modal" class="templates-modal hidden">
     <div id="templates-modal-backdrop" class="templates-modal-backdrop"></div>
     <div class="templates-modal-panel">
       <div class="templates-modal-header">
-        <h3>Modelos de Layout</h3>
+        <h3>Layouts</h3>
         <input type="text" id="templates-search" class="control-input" placeholder="Buscar modelo...">
         <button id="templates-modal-close" title="Fechar">✕</button>
+      </div>
+      <div id="templates-tabs" class="templates-tabs">
+        <button id="templates-tab-meus" class="templates-tab active" data-tab="meus">Meus layouts sob medida</button>
+        <button id="templates-tab-mais" class="templates-tab" data-tab="mais">Mais layouts</button>
       </div>
       <div id="templates-category-filters" class="templates-category-filters"></div>
       <div id="templates-grid" class="templates-grid"></div>

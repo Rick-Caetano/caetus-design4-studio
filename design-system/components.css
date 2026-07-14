@@ -44,6 +44,48 @@
   opacity: 0.55;
 }
 
+/* Faixa zigue-zague (BrandTheme Joá — ver brand-spec.md "Postura de Layout").
+   Diferente de ds-diagonal-band: borda serrilhada via clip-path repetido, não um
+   corte diagonal único. */
+.ds-zigzag-band {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 64px;
+  background: var(--accent);
+  clip-path: polygon(
+    0% 100%, 0% 40%, 5% 0%, 10% 40%, 15% 0%, 20% 40%, 25% 0%, 30% 40%, 35% 0%,
+    40% 40%, 45% 0%, 50% 40%, 55% 0%, 60% 40%, 65% 0%, 70% 40%, 75% 0%, 80% 40%,
+    85% 0%, 90% 40%, 95% 0%, 100% 40%, 100% 100%
+  );
+}
+
+/* Padrão de losangos pontilhados (BrandTheme Joá — ver brand-spec.md "Postura de
+   Layout", Do's #4). Grade de pontos full-bleed via radial-gradient, tingida com o
+   token de marca ativo em vez de branco fixo, para acompanhar qualquer BrandTheme. */
+.ds-dotted-diamond-pattern {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.16;
+  background-image: radial-gradient(var(--accent) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  background-position: 0 0;
+}
+
+/* Faixa footer colorida (BrandTheme Joá — ver brand-spec.md "Postura de Layout",
+   Don'ts: nunca reduzir a marca a um visual clean/corporativo sem cor). Troca o
+   hairline neutro de ds-footer-bar por uma barra em var(--accent) com raio 999px
+   (raio padrão de componente do brand-spec da marca). */
+.ds-footer-bar-accent {
+  left: 96px;
+  bottom: 130px;
+  width: calc(100% - 192px);
+  height: 3px;
+  background: var(--accent);
+  border-radius: 999px;
+}
+
 .ds-watermark-pattern .p1,
 .ds-watermark-pattern .p2 {
   position: absolute;

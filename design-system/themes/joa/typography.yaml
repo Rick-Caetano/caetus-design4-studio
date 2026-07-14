@@ -1,0 +1,15 @@
+# Fontes de brand-spec.md: Baloo 2 (display, arredondada/festiva), Nunito (corpo),
+# Caveat (script/assinatura — usar com moderação, ver Do's/Don'ts do brand-spec).
+googleFontsUrl: "https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700&family=Caveat:wght@600&display=swap"
+
+display:
+  family: "Baloo 2"
+  stack: "system-ui, sans-serif"
+
+body:
+  family: "Nunito"
+  stack: "system-ui, sans-serif"
+
+mono:
+  family: "Caveat"
+  stack: "cursive"

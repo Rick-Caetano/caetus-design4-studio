@@ -20,6 +20,11 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Cópia local de assets/stock/ da raiz do monorepo — a fonte única fica lá
+# (ver .caetus/rules/assets.md); iniciar.py já serve a partir da raiz do
+# projeto especificamente para não precisar duplicar isso aqui.
+/assets/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

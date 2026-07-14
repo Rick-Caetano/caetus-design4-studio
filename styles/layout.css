@@ -498,6 +498,43 @@
 .templates-modal-header button:hover {
   color: white;
 }
+.templates-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid #334155;
+}
+.templates-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+.templates-tab:hover {
+  color: white;
+}
+.templates-tab.active {
+  color: white;
+  border-bottom-color: #3b82f6;
+}
+.templates-section-title {
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 4px 0 -4px;
+  grid-column: 1 / -1;
+}
+.templates-empty-hint {
+  color: #6b7280;
+  font-size: 13px;
+  grid-column: 1 / -1;
+}
+
 .templates-category-filters,
 .elementos-category-filters {
   display: flex;
@@ -982,4 +1019,166 @@
 .settings-option-disabled {
   color: #9ca3af;
   cursor: not-allowed;
+}
+
+/* Gate de seleção de empresa — primeira página (ver app/editor/empresa-gate.js).
+   z-index acima de tudo; body.empresa-gate-active esconde o resto do app atrás. */
+.empresa-gate.hidden {
+  display: none;
+}
+.empresa-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0b1220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body.empresa-gate-active .app-container {
+  display: none;
+}
+.empresa-gate-panel {
+  text-align: center;
+  padding: 32px;
+}
+.empresa-gate-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.empresa-gate-subtitle {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-top: 8px;
+}
+.empresa-gate-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+}
+.empresa-gate-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: #161f33;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 28px 36px;
+  cursor: pointer;
+  color: white;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.empresa-gate-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+.empresa-gate-card-icon {
+  font-size: 32px;
+}
+.empresa-gate-card-label {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Tema da marca (app/editor/tema-panel.js) — cards de BrandTheme, mesmo padrão
+   visual de .template-card (borda #334155, hover azul, fundo #0d1527), com preview
+   de tipografia+paleta e um ✓ de card ativo em vez de depender só da borda. */
+.tema-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.tema-card {
+  position: relative;
+  cursor: pointer;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0d1527;
+  padding: 0;
+  text-align: left;
+  transition: border-color 0.15s ease, transform 0.1s ease;
+}
+.tema-card:hover {
+  border-color: #3b82f6;
+}
+.tema-card:active {
+  transform: scale(0.98);
+}
+.tema-card.active {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+.tema-card.active::after {
+  content: "✓";
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #3b82f6;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tema-card-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 14px;
+  min-height: 88px;
+}
+.tema-card-preview-title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+.tema-card-preview-body {
+  font-size: 11px;
+  font-weight: 600;
+}
+.tema-card-preview-chip {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.tema-card-swatches {
+  display: flex;
+  gap: 4px;
+  padding: 10px 14px 0;
+}
+.tema-card-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+.tema-card-label {
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 14px 0;
+}
+.tema-card-desc {
+  color: #9ca3af;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 4px 14px 12px;
 }
