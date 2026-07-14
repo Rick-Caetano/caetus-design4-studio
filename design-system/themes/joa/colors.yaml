@@ -1,0 +1,11 @@
+# Tokens de brand-spec.md (empresas/espaco_de_festa_joa, via projeto open-design) —
+# mapeados nos 6 tokens semânticos suportados hoje pelo engine (TOKEN_KEYS em
+# design-system/themes/index.js). --gold/--fg-on-dark ficam de fora do whitelist
+# nesta fatia; usados como CSS por componente onde necessário (ex.: zigzagBand).
+tokens:
+  bg:      "oklch(32% 0.14 322)"  # --purple-deep — fundo roxo profundo (layout "convite")
+  surface: "oklch(99% 0.006 80)"  # --surface — quase-branco quente, cards/selo
+  fg:      "oklch(22% 0.03 322)"  # --fg — roxo quase-preto, texto sobre claro
+  accent:  "oklch(42% 0.16 330)"  # --purple — magenta do degradê, cor de marca primária
+  muted:   "oklch(55% 0.02 322)"  # --muted
+  border:  "oklch(90% 0.02 322)"  # --border

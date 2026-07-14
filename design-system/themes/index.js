@@ -10,7 +10,7 @@
 // (Um índice em disco — themes/index.yaml — evitaria essa lista, mas ainda temos só três
 //  temas; simples-e-explícito ganha por enquanto.)
 
-const THEME_KEYS = ['caetus', 'editorial', 'vibrant'];
+const THEME_KEYS = ['caetus', 'editorial', 'vibrant', 'joa'];
 
 function yamlLoad(text) {
   const jsyaml = window.jsyaml;

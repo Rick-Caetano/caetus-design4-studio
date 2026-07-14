@@ -6,6 +6,10 @@ import themes from '../../design-system/themes/index.js';
 import { getState, setState } from '../canvas/state.js';
 import bus from '../events/bus.js';
 
+// Só decoração visual (ver pedido de deixar a aba menos crua) — não afeta nenhuma
+// lógica. Tema sem entrada aqui cai no ícone genérico.
+const THEME_ICONS = { caetus: '🔷', editorial: '📰', vibrant: '🎨', joa: '🎉' };
+
 function render() {
   const grid = document.getElementById('tema-grid');
   if (!grid) return;
@@ -24,9 +28,10 @@ function render() {
     const body = theme.typography.body?.family || 'sans-serif';
     const swatches = Object.entries(theme.colors)
       .map(([k, v]) => `<span class="tema-card-swatch" style="background:${v}" title="${k}"></span>`).join('');
+    const icon = THEME_ICONS[theme.key] || '🎨';
     card.innerHTML = `
       <div class="tema-card-preview" style="background:${theme.colors.bg};color:${theme.colors.fg};">
-        <div class="tema-card-preview-title" style="font-family:'${display}',serif;">Aa</div>
+        <div class="tema-card-preview-title" style="font-family:'${display}',serif;">${icon} Aa</div>
         <div class="tema-card-preview-body" style="font-family:'${body}',sans-serif;color:${theme.colors.muted}">${theme.label}</div>
         <div class="tema-card-preview-chip" style="background:${theme.colors.accent};color:${theme.colors.surface};font-family:'${body}',sans-serif">CTA</div>
       </div>
