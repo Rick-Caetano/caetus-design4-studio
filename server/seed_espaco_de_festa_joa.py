@@ -101,10 +101,15 @@ def build_state(template_key, title, subtitle, selo, category, background, band_
 PRESETS = [
     (
         'familiar', 'Familiar', ['Ambiente Familiar'],
-        'minimal',
+        # Reference (index.html do protótipo) usa layout 'vibrante' = foto de fundo
+        # + texto claro. No motor novo isso é 'cinematic' (canvasClass
+        # 'layout-cinematic' já troca --fg/--muted por --surface — ver
+        # design-system/components.css). Antes vinha 'minimal', que renderiza texto
+        # roxo-escuro sobre a foto e ficava ilegível.
+        'cinematic',
         'Aqui, a festa é [em família].',
-        'Espaço pensado para crianças e adultos aproveitarem juntos, com toda a estrutura que sua celebração merece.',
-        'Ambiente seguro e acolhedor para toda a família.',
+        'Um espaço pensado para reunir quem você ama, com estrutura de recreação para as crianças.',
+        'Ambiente amplo, familiar e pronto para a sua comemoração.',
         'AMBIENTE FAMILIAR',
         # Os "fundos" disponíveis (memoria/imagens/) são, na real, POSTS JÁ PRONTOS
         # (checklist com texto embutido, logo, moldura) — não fotos soltas. Usados a
@@ -114,14 +119,14 @@ PRESETS = [
         # uma textura de cor atmosférica, sem o texto embutido ficar legível.
         {'preset': 'custom', 'customUrl': f'{IMG}/beneficios-espaço-joa.jpg', 'opacity': 18, 'blur': 4, 'x': 0, 'y': 0, 'scale': 1.15, 'fit': 'cover'},
         True,
-        True,  # light_text — fundo roxo profundo (--bg), sem canvasClass cinematic aqui
+        False,  # light_text — 'cinematic' já resolve pela canvasClass, sem hack no state
     ),
     (
         'versatil', 'Versátil', ['Espaço Versátil'],
         'split',
         'Um espaço [amplo e versátil] para qualquer festa.',
-        'Do aniversário infantil à formatura — o espaço se adapta ao tamanho e ao estilo da sua celebração.',
-        'Você escolhe o tema, a decoração e o jeito — o espaço se adapta.',
+        'Do aniversário infantil à comemoração em família — o espaço se adapta ao seu evento.',
+        'Estrutura pronta para recreação e para qualquer estilo de festa.',
         'ESPAÇO VERSÁTIL',
         # split reserva um painel inteiro pra essa imagem (mais peso visual que os
         # outros dois layouts), mas ainda é um post pronto com texto/logo embutidos —
@@ -139,8 +144,8 @@ PRESETS = [
         # variante ("convite"), quase ilegível.
         'cinematic',
         'Decore do jeito que [você imaginou].',
-        'Sem pacote fechado, sem regra engessada — traga sua decoração e transforme o espaço do seu jeito.',
-        'Liberdade total para decorar do seu jeito, sem regras.',
+        'Liberdade total pra personalizar o tema e o estilo da sua festa, sem restrições.',
+        'Liberdade de decoração — a festa fica do seu jeito.',
         'LIBERDADE DE DECORAÇÃO',
         {'preset': 'none', 'customUrl': '', 'opacity': 0, 'blur': 0, 'x': 0, 'y': 0, 'scale': 1, 'fit': 'cover'},
         True,
